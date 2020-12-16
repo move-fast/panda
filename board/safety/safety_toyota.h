@@ -13,12 +13,6 @@ const int TOYOTA_MAX_RT_DELTA = 375;      // max delta torque allowed for real t
 const uint32_t TOYOTA_RT_INTERVAL = 250000;    // 250ms between real time checks
 
 // longitudinal limits
-const int TOYOTA_MAX_ACCEL = 1500;        // 1.5 m/s2
-const int TOYOTA_MIN_ACCEL = -3000;       // -3.0 m/s2
-
-const int TOYOTA_ISO_MAX_ACCEL = 2000;        // 2.0 m/s2
-const int TOYOTA_ISO_MIN_ACCEL = -3500;       // -3.5 m/s2
-
 const int TOYOTA_STANDSTILL_THRSLD = 100;  // 1kph
 
 const CanMsg TOYOTA_TX_MSGS[] = {{0x283, 0, 7}, {0x2E6, 0, 8}, {0x2E7, 0, 8}, {0x33E, 0, 7}, {0x344, 0, 8}, {0x365, 0, 7}, {0x366, 0, 7}, {0x4CB, 0, 8},  // DSU bus 0
@@ -131,15 +125,6 @@ static int toyota_tx_hook(CAN_FIFOMailBox_TypeDef *to_send) {
 
   // Check if msg is sent on BUS 0
   if (bus == 0) {
-
-    // GAS PEDAL: safety check
-    if (addr == 0x200) {
-      if (!controls_allowed) {
-        if (GET_BYTE(to_send, 0) || GET_BYTE(to_send, 1)) {
-          tx = 0;
-        }
-      }
-    }
 
     // STEER: safety check on bytes 2-3
     if (addr == 0x2E4) {
