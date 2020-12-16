@@ -135,14 +135,6 @@ void set_safety_mode(uint16_t mode, int16_t param) {
       }
       can_silent = ALL_CAN_LIVE;
       break;
-    case SAFETY_ELM327:
-      set_intercept_relay(false);
-      heartbeat_counter = 0U;
-      if (board_has_obd()) {
-        current_board->set_can_mode(CAN_MODE_OBD_CAN2);
-      }
-      can_silent = ALL_CAN_LIVE;
-      break;
     default:
       set_intercept_relay(true);
       heartbeat_counter = 0U;
@@ -448,8 +440,7 @@ int usb_cb_control_msg(USB_Setup_TypeDef *setup, uint8_t *resp, bool hardwired) 
       // Blocked over WiFi.
       // Allow SILENT, NOOUTPUT and ELM security mode to be set over wifi.
       if (hardwired || (setup->b.wValue.w == SAFETY_SILENT) ||
-                       (setup->b.wValue.w == SAFETY_NOOUTPUT) ||
-                       (setup->b.wValue.w == SAFETY_ELM327)) {
+                       (setup->b.wValue.w == SAFETY_NOOUTPUT)) {
         set_safety_mode(setup->b.wValue.w, (uint16_t) setup->b.wIndex.w);
       }
       break;
@@ -478,8 +469,7 @@ int usb_cb_control_msg(USB_Setup_TypeDef *setup, uint8_t *resp, bool hardwired) 
     case 0xdf:
       // you can only set this if you are in a non car safety mode
       if ((current_safety_mode == SAFETY_SILENT) ||
-          (current_safety_mode == SAFETY_NOOUTPUT) ||
-          (current_safety_mode == SAFETY_ELM327)) {
+          (current_safety_mode == SAFETY_NOOUTPUT)) {
         unsafe_mode = setup->b.wValue.w;
       }
       break;
