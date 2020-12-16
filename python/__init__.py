@@ -366,12 +366,11 @@ class Panda(object):
       "ignition_line": a[8],
       "ignition_can": a[9],
       "controls_allowed": a[10],
-      "gas_interceptor_detected": a[11],
-      "car_harness_status": a[12],
-      "usb_power_mode": a[13],
-      "safety_mode": a[14],
-      "fault_status": a[15],
-      "power_save_enabled": a[16]
+      "car_harness_status": a[11],
+      "usb_power_mode": a[12],
+      "safety_mode": a[13],
+      "fault_status": a[14],
+      "power_save_enabled": a[15]
     }
 
   # ******************* control *******************

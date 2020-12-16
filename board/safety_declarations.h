@@ -94,8 +94,6 @@ void safety_tick(const safety_hooks *hooks);
 // This can be set by the safety hooks
 bool controls_allowed = false;
 bool relay_malfunction = false;
-bool gas_interceptor_detected = false;
-int gas_interceptor_prev = 0;
 bool gas_pressed = false;
 bool gas_pressed_prev = false;
 bool brake_pressed = false;

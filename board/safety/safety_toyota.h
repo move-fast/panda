@@ -21,18 +21,9 @@ const int TOYOTA_ISO_MIN_ACCEL = -3500;       // -3.5 m/s2
 
 const int TOYOTA_STANDSTILL_THRSLD = 100;  // 1kph
 
-// Roughly calculated using the offsets in openpilot +5%:
-// In openpilot: ((gas1_norm + gas2_norm)/2) > 15
-// gas_norm1 = ((gain_dbc*gas1) + offset1_dbc)
-// gas_norm2 = ((gain_dbc*gas2) + offset2_dbc)
-// In this safety: ((gas1 + gas2)/2) > THRESHOLD
-const int TOYOTA_GAS_INTERCEPTOR_THRSLD = 845;
-#define TOYOTA_GET_INTERCEPTOR(msg) (((GET_BYTE((msg), 0) << 8) + GET_BYTE((msg), 1) + (GET_BYTE((msg), 2) << 8) + GET_BYTE((msg), 3)) / 2) // avg between 2 tracks
-
 const CanMsg TOYOTA_TX_MSGS[] = {{0x283, 0, 7}, {0x2E6, 0, 8}, {0x2E7, 0, 8}, {0x33E, 0, 7}, {0x344, 0, 8}, {0x365, 0, 7}, {0x366, 0, 7}, {0x4CB, 0, 8},  // DSU bus 0
                                   {0x128, 1, 6}, {0x141, 1, 4}, {0x160, 1, 8}, {0x161, 1, 7}, {0x470, 1, 4},  // DSU bus 1
-                                  {0x2E4, 0, 5}, {0x1D2, 0, 8},  // LKAS + ACC cancel
-                                  {0x200, 0, 6}};  // interceptor
+                                  {0x2E4, 0, 5}, {0x1D2, 0, 8}};  // LKAS + ACC cancel
 
 AddrCheckStruct toyota_rx_checks[] = {
   {.msg = {{ 0xaa, 0, 8, .check_checksum = false, .expected_timestep = 12000U}}},
@@ -99,9 +90,7 @@ static int toyota_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
       cruise_engaged_prev = cruise_engaged;
 
       // sample gas pedal
-      if (!gas_interceptor_detected) {
-        gas_pressed = ((GET_BYTE(to_push, 0) >> 4) & 1) == 0;
-      }
+      gas_pressed = ((GET_BYTE(to_push, 0) >> 4) & 1) == 0;
     }
 
     // sample speed
@@ -119,16 +108,6 @@ static int toyota_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
     if ((addr == 0x224) || (addr == 0x226)) {
       int byte = (addr == 0x224) ? 0 : 4;
       brake_pressed = ((GET_BYTE(to_push, byte) >> 5) & 1) != 0;
-    }
-
-    // sample gas interceptor
-    if (addr == 0x201) {
-      gas_interceptor_detected = 1;
-      int gas_interceptor = TOYOTA_GET_INTERCEPTOR(to_push);
-      gas_pressed = gas_interceptor > TOYOTA_GAS_INTERCEPTOR_THRSLD;
-
-      // TODO: remove this, only left in for gas_interceptor_prev test
-      gas_interceptor_prev = gas_interceptor;
     }
 
     generic_rx_checks((addr == 0x2E4));
@@ -217,7 +196,6 @@ static int toyota_tx_hook(CAN_FIFOMailBox_TypeDef *to_send) {
 static void toyota_init(int16_t param) {
   controls_allowed = 0;
   relay_malfunction_reset();
-  gas_interceptor_detected = 0;
   toyota_dbc_eps_torque_factor = param;
 }
 

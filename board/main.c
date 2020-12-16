@@ -54,7 +54,6 @@ struct __attribute__((packed)) health_t {
   uint8_t ignition_line_pkt;
   uint8_t ignition_can_pkt;
   uint8_t controls_allowed_pkt;
-  uint8_t gas_interceptor_detected_pkt;
   uint8_t car_harness_status_pkt;
   uint8_t usb_power_mode_pkt;
   uint8_t safety_mode_pkt;
@@ -171,7 +170,6 @@ int get_health_pkt(void *dat) {
   health->ignition_can_pkt = (uint8_t)(ignition_can);
 
   health->controls_allowed_pkt = controls_allowed;
-  health->gas_interceptor_detected_pkt = gas_interceptor_detected;
   health->can_rx_errs_pkt = can_rx_errs;
   health->can_send_errs_pkt = can_send_errs;
   health->can_fwd_errs_pkt = can_fwd_errs;
