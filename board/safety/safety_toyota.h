@@ -236,8 +236,10 @@ static void toyota_init(int16_t param) {
   toyota_dbc_eps_torque_factor = param;
 }
 
-static int toyota_fwd_hook(int bus_num, CAN_FIFOMailBox_TypeDef *to_fwd) {
+CAN_FIFOMailBox_TypeDef* tmp;
 
+static int toyota_fwd_hook(int bus_num, CAN_FIFOMailBox_TypeDef *to_fwd) {
+  tmp = to_fwd;
   int bus_fwd = -1;
   if (!relay_malfunction) {
     if (bus_num == 0) {
