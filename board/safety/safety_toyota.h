@@ -244,14 +244,7 @@ static int toyota_fwd_hook(int bus_num, CAN_FIFOMailBox_TypeDef *to_fwd) {
       bus_fwd = 2;
     }
     if (bus_num == 2) {
-      int addr = GET_ADDR(to_fwd);
-      // block stock lkas messages and stock acc messages (if OP is doing ACC)
-      // in TSS2, 0x191 is LTA which we need to block to avoid controls collision
-      int is_lkas_msg = ((addr == 0x2E4) || (addr == 0x191));
-      int block_msg = is_lkas_msg;
-      if (!block_msg) {
-        bus_fwd = 0;
-      }
+      bus_fwd = 0;
     }
   }
   return bus_fwd;
